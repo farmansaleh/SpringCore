@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+					    http://www.springframework.org/schema/beans/spring-beans.xsd
+					    http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/aop   
+    					http://www.springframework.org/schema/aop/spring-aop.xsd">
+    			
+    <!-- on all annotation by default its off -->
+    <context:annotation-config />
+    <!--  load  the properties file -->
+	<context:property-placeholder location="classpath:employee-info"/>
+	<context:component-scan base-package="com.spring.core"></context:component-scan>
+<!-- 	Aspect enabled -->
+	<aop:aspectj-autoproxy/>
+                
+    <bean class="com.spring.core.di.Car" id="engine" scope = "prototype" init-method="init" destroy-method="destroys"/>
+    
+    <bean class="com.spring.core.autowired.Company" id="company" />
+    
+<!--     <bean class="com.spring.core.sel.SpringExpressionLangEX" id="sele" /> -->
+    
+<!--     <bean class="com.spring.core.sel.SELContainer" id="cont"> -->
+<!--     	<property name="springExpressionLangEX" ref="sele" /> -->
+<!--     </bean> -->
+    
+    <bean class="com.spring.core.autowired.HRDept" id="dept"/>
+<!--     <bean class="com.spring.core.autowired.ITDept" id="deptc"/> -->
+
+<!-- 	<bean class="com.spring.core.li.Employee" id="employee"> -->
+<!-- 		<property name="id" value="101" /> -->
+<!-- 		<property name="name" value="faizal" /> -->
+<!-- 		<property name="salary" value="25500" /> -->
+<!-- 	</bean> -->
+	
+</beans>

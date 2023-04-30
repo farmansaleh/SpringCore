@@ -1,0 +1,464 @@
+Spring Concepts 
+
+	1. Inversion of Control
+		--> Inversion Of Control (IoC) is a concept of software engineering, 
+			where the control of objects or a block of a program is transferred 
+			to a container or framework.
+
+		--> IoC allows a container to take control of the flow of a program and 
+			make calls to our custom code rather than making calls to a library. 
+			To implement IoC, the Spring Dependency Injection concept is used.
+			
+		--> IoC main intention is achieve loose coupling and don't change+ in source code,
+			if any change is there then change in config file.
+			
+		--> The IoC container is responsible to instantiate, configure and assemble 
+			the objects. The IoC container gets informations from the XML file and works accordingly.
+			
+		--> IOC take control of object creation from programmer and inject all dependent 
+			object/dependency at runtime, it's called IOC
+		
+	2. Dependency Injection
+		--> Spring Dependency Injection (DI) is the feature of the core module 
+			of the Spring Framework, where the Spring Container injects other 
+			objects into an object. Here, other objects are nothing but 
+			dependencies (instance variables) which are declared in the class (Spring Bean).
+			
+	3. What are the types of Spring Dependency injection? Explain with example
+		
+		3.1 Setter Based Injection
+			--> When Spring Container provides values to variables using setter method, 
+				we call it Setter Injection. In this case, Spring Container uses the default 
+				constructor to create the object. When the annotation @Autowired is used on 
+				top of the class’s setter method, it is known as Setter based Dependency Injection.
+				
+				Ex. 
+					@Component  
+					public class Vendor{ 
+					   int code;  
+					   String name; 
+					}  
+					 
+					public class Invoice{ 
+						
+					   private Vendor vendor; 
+					 
+					   @Autowired 
+					   public void setVendor(Vendor vendor){ 
+						  this.vendor=vendor; 
+					   } 
+					}
+					
+		3.2 Constructor Based Injection
+			--> When Spring Container provides values to variables using parameterized constructor, 
+				we call it Constructor Injection. Please note that Spring Container uses parameterized 
+				constructor to create the object in this case. When the annotation @Autowired is used 
+				on top of the class constructor, it is known as Constructor-based Dependency Injection.
+				
+				Ex.
+					@Component  
+					public class Vendor{   
+					   int code;    
+					   String name; 
+					}  
+					 
+					public class Invoice{ 
+					 
+					   private Vendor vendor; 
+					 
+					   @Autowired 
+					   public Invoice(Vendor vendor){ 
+						  this.vendor=vendor; 
+					   }  
+					}
+				
+		3.3 Field or Property Based Injection
+			--> When the annotation @Autowired is used on top of the field or property in the class, 
+				it is known as Field-based Dependency Injection.
+				
+				Ex.
+					@Component  //internal - it will create object/bean in config file like <bean class='package.Vendor' id='vendor'>
+					public class Vendor{   
+					   int code;    
+					   String name; 
+					}  
+					 
+					public class Invoice{ 
+					 
+					  @Autowired 
+					  private Vendor vendor;
+					}
+					
+				--> Similar to above both Dependency Injection, here the Autowiring takes place by means 
+					of the field ‘vendor’. The bean object created for Vendor class will be Autowired & injected 
+					via the field, ‘vendor’ in Invoice class.
+
+					In this case, while creating the Invoice object, if there’s no constructor or setter method 
+					is available to inject the Vendor bean, the container will use reflection to inject Vendor into Invoice.
+					
+		3.4 When to use @Autowired(required = false) ?
+			--> Suppose a bean is not registered with Spring Container and we try to apply the @Autowired annotation on it, 
+				then Spring will throw an exception because the required dependency is missing. In this case, we can use 
+				@Autowired(required = false) to tell Spring Container that this dependency is optional. On doing so, Spring 
+				will not throw any exception of the missing dependency.
+				
+	4. There are two types of IoC containers.
+		
+		4.1 BeanFactory
+			--> It is a fundamental container that provides the basic functionality for managing beans.
+			--> It is suitable to build standalone applications.
+			--> It supports only Singleton and Prototype bean scopes.
+			--> It does not support Annotations. In Bean Autowiring, we need to configure the properties in XML file only.
+			--> BeanFactory will create a bean object when the getBean() method is called thus making it Lazy initialization.
+			--> BeanFactory interface provides basic features only thus requires less memory. For standalone applications 
+				where the basic features are enough and when memory consumption is critical, we can use BeanFactory.
+			
+		4.2 ApplicationContext
+			--> It is an advanced container that extends the BeanFactory that provides all basic functionality and adds some advanced features.
+			--> It is suitable to build Web applications, integration with AOP modules, ORM and distributed applications.
+			--> It supports all types of bean scopes such as Singleton, Prototype, Request, Session etc.
+			--> It supports Annotation based configuration in Bean Autowiring.
+			--> ApplicationContext loads all the beans and creates objects at the time of startup only thus making it Eager initialization.
+			--> ApplicationContext provides all the basic features and advanced features, including several that are geared towards enterprise applications thus requires more memory.
+			
+		Bean Factory - Implements - XMlBeanFactory 
+		Bean Factory - Extends - Application Context - Extends - ClassPathXmlApplicationContext,FileSystemXmlApplicationContext,AnnotationConfigWebApplicationContext
+		
+	5. Bean Life Cycle
+		--> Bean life cycle is managed by the spring container. When we run the program then, first of all, 
+			the spring container gets started. After that, the container creates the instance of a bean as per the request, 
+			and then dependencies are injected. And finally, the bean is destroyed when the spring container is closed. 
+			Therefore, if we want to execute some code on the bean instantiation and just after closing the spring container, 
+			then we can write that code inside the custom init() method and the destroy() method.
+
+		Note: We can choose custom method name instead of init() and destroy(). Here, we will use init() method to execute all its 
+			  code as the spring container starts up and the bean is instantiated, and destroy() method to execute all its code on 
+			  closing the container. 
+
+			Bean Life Cycle Step : Container started -> Bean Instantiated -> Dependencies Injected -> Custom init method -> Custom utility method -> Custom Destroy method
+
+
+		--> Ways to implement the life cycle of a bean
+			
+			5.1 By XML: 
+				--> In this approach, in order to avail custom init() and destroy() method for a bean we have to register 
+					these two methods inside Spring XML configuration file while defining a bean.
+
+					Ex.
+						public class HelloWorld {
+ 
+							// This method executes automatically as the bean is instantiated
+							public void init() throws Exception
+							{
+								System.out.println("Bean HelloWorld has been instantiated and I'm the init() method");
+							}
+						 
+							// This method executes when the spring container is closed
+							public void destroy() throws Exception
+							{
+								System.out.println("Container has been closed and I'm the destroy() method");
+							}
+						}
+						<beans>
+							<bean id="hw" class="beans.HelloWorld" init-method="init" destroy-method="destroy"/>
+						</beans>
+						// Driver class
+						public class Client {
+						 
+							public static void main(String[] args) throws Exception
+							{
+						 
+								// Loading the Spring XML configuration file into the spring container and
+								// it will create the instance of the bean as it loads into container
+						 
+								ConfigurableApplicationContext cap = new ClassPathXmlApplicationContext("resources/spring.xml");
+						 
+								// It will close the spring container and as a result invokes the destroy() method
+								cap.close();
+							}
+						}
+
+			5.2 By Programmatic Approach
+				--> To provide the facility to the created bean to invoke custom init() method on the startup of a spring container and 
+					to invoke the custom destroy() method on closing the container, we need to implement our bean with two interfaces namely 
+					InitializingBean, DisposableBean and will have to override afterPropertiesSet() and destroy() method. 
+					afterPropertiesSet() method is invoked as the container starts and the bean is instantiated whereas, 
+					the destroy() method is invoked just after the container is closed. 
+
+				Note: To invoke destroy method we have to call a close() method of ConfigurableApplicationContext.
+
+				Ex. 
+					public class HelloWorld implements InitializingBean,DisposableBean {
+					 
+						@Override
+						// It is the init() method of our bean and it gets invoked on bean instantiation
+						public void afterPropertiesSet() throws Exception
+						{
+							System.out.println("Bean HelloWorld has been instantiated and I'm the init() method");
+						}
+					 
+						@Override
+						// This method is invokedjust after the container is closed
+						public void destroy() throws Exception
+						{
+							System.out.println("Container has been closed and I'm the destroy() method");
+						}
+					}
+
+			5.3 Using Annotation
+				--> To provide the facility to the created bean to invoke custom init() method on the startup of a spring container and 
+					to invoke the custom destroy() method on closing the container, we need annotate init() method by @PostConstruct annotation 
+					and destroy() method by @PreDestroy annotation.
+
+					Note: To invoke the destroy() method we have to call the close() method of ConfigurableApplicationContext.
+
+					Ex. 
+						public class HelloWorld {
+
+							// Annotate this method to execute it automatically as the bean is instantiated
+							@PostConstruct
+							public void init() throws Exception
+							{
+								System.out.println("Bean HelloWorld has been instantiated and I'm the init() method");
+							}
+
+							// Annotate this method to execute it when Spring container is closed
+							@PreDestroy
+							public void destroy() throws Exception
+							{
+								System.out.println("Container has been closed and I'm the destroy() method");
+							}
+						}
+
+						<beans>
+ 
+							<!-- activate the @PostConstruct and @PreDestroy annotation -->
+						 
+							<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+						 
+							<!-- configure the bean -->
+							<bean class="beans.HelloWorld"/>
+							 
+						</beans>
+
+	6. Difference between constructor and setter inject
+		6.1 Partial dependency
+			--> can be injected using setter injection but it is not possible by constructor. Suppose there are 3 properties in a class, 
+				having 3 arg constructor and setters methods. In such case, if you want to pass information for only one property, 
+				it is possible by setter method only.
+		6.2 Overriding 
+			--> Setter injection overrides the constructor injection. If we use both constructor and setter injection, 
+				IOC container will use the setter injection.
+		
+		6.3 Changes
+			--> We can easily change the value by setter injection. It doesn't create a new bean instance always like constructor. 
+				So setter injection is flexible than constructor injection.
+
+	7. Autowiring in Spring
+		--> Autowiring feature of spring framework enables you to inject the object dependency implicitly. 
+			It internally uses setter or constructor injection.
+
+		-->	Autowiring can't be used to inject primitive and string values. It works with reference only.
+
+		--> Advantage of Autowiring
+			--> It requires the less code because we don't need to write the code to inject the dependency explicitly.
+
+		--> Disadvantage of Autowiring
+			--> No control of programmer.
+			--> It can't be used for primitive and string values.
+			
+		Note : Autowire not supported on static field
+
+		--> There are many autowiring modes :
+			7.1 No
+				--> It is the default autowiring mode. It means no autowiring bydefault.
+		
+			7.2 byName
+				--> The byName mode injects the object dependency according to name of the bean. In such case, 
+					property name and bean name must be same. It internally calls setter method.
+
+			7.3 byType
+				--> The byType mode injects the object dependency according to type. 
+					So property name and bean name can be different. It internally calls setter method
+
+			7.4 constructor
+				--> The constructor mode injects the dependency by calling the constructor of the class. 
+					It calls the constructor having large number of parameters.
+
+			7.5 autodetect
+				--> It is deprecated since Spring 3.
+	8. Bean Scope
+		
+		8.1 singleton
+			--> This scopes the bean definition to a single instance per Spring IoC container (default).Means every time return exiting object.
+
+		8.2 prototype
+			--> This scopes a single bean definition to have any number of object instances.Means every time return new object for each container request.
+
+		8.3 request
+		8.4 session
+		8.2 global-session
+			--> This is used to create global session beans for Portlet applications.
+
+	9. Spring Expression Language (SPEL)
+		--> SpEL is an exression language supporting the features of querying and manipulating an object graph at runtime.
+		--> We can use many operators in SpEL such as arithmetic, relational, logical.
+		--> we can store a value in the variable and use the variable in the method and call the method. To work on variable, we need to use StandardEvaluationContext class.
+
+		--> SpEL API
+			--> Expression interface
+			--> SpelExpression class
+			--> ExpressionParser interface
+			--> SpelExpressionParser class
+			--> EvaluationContext interface
+			--> StandardEvaluationContext class
+
+			Ex. 
+				SpelExpressionParser sep = new SpelExpressionParser();
+				Expression expression = sep.parseExpression("'Spring'.length()");
+				System.out.println(expression.getValue());
+
+				@Value("#{T(java.lang.Math).PI}")
+
+				--> Value Store in Variable
+
+					public class Calculation {  
+						private int number;  
+						public int getNumber() {  
+							return number;  
+						}  
+						public void setNumber(int number) {  
+							this.number = number;  
+						}  
+						public int cube(){  
+							return number*number*number;  
+						}  
+					}
+					public static void main(String[] args) {  
+						Calculation calculation=new Calculation();  
+						StandardEvaluationContext context=new StandardEvaluationContext(calculation);  
+							  
+						ExpressionParser parser = new SpelExpressionParser();  
+						parser.parseExpression("number").setValue(context,"5");  
+							  
+						System.out.println(calculation.cube());  
+					}
+					
+	10. AOP
+		--> Spring AOP main target is Cross cutting concern. in real time scenario generally to use to perform logging, transaction, 
+			performance monitor related stuff.
+		
+		--> AOP breaks the program logic into distinct parts (called concerns). It is used to increase modularity by cross-cutting concerns.
+		
+		--> A cross-cutting concern is a concern that can affect the whole application and should be centralized in one location in code as possible, 
+			such as transaction management, authentication, logging, security etc / A common functionality which is required in entire application or
+			across the application.
+		
+		--> The key unit of modularity in OOP is the class, whereas in AOP the unit of modularity is the aspect. Dependency Injection 
+			helps you decouple your application objects from each other and AOP helps you decouple cross-cutting concerns from the objects 
+			that they affect. AOP is like triggers in programming languages such as Perl, .NET, Java, and others.
+		
+		Why AOP : 
+			--> It provides the pluggable way to dynamically add the additional concern before, after or around the actual logic.
+				Suppose there are 10 methods in a class as given below:
+				
+				For Ex.
+					class A{  
+						public void m1(){...}  
+						public void m2(){...}  
+						public void m3(){...}  
+						public void m4(){...}  
+						public void m5(){...}  
+						public void n1(){...}  
+						public void n2(){...}  
+						public void p1(){...}  
+						public void p2(){...}  
+						public void p3(){...}  
+					}
+					
+				--> There are 5 methods that starts from m, 2 methods that starts from n and 3 methods that starts from p.
+
+				--> Understanding Scenario I have to maintain log and send notification after calling methods that starts from m.
+
+				--> Problem without AOP We can call methods (that maintains log and sends notification) from the methods starting with m. 
+					In such scenario, we need to write the code in all the 5 methods.
+
+				--> But, if client says in future, I don't have to send notification, you need to change all the methods. 
+					It leads to the maintenance problem.
+
+				--> Solution with AOP We don't have to call methods from the method. Now we can define the additional concern like maintaining log, 
+					sending notification etc. in the method of a class. Its entry is given in the xml file.
+
+				--> In future, if client says to remove the notifier functionality, we need to change only in the xml file. So, maintenance is easy in AOP.
+			
+				10.1 Logging 
+					--> you can handle log feature using just one Aspect class. that class will put all required log for entire application. 
+						no need to write log in each and every method.
+
+				10.2 Transaction 
+					--> that is same like above you can put transaction using Aspect class
+
+				10.3 Performance Monitor 
+					--> by using AOP you can easily monitor the execution time of any method. so before calculate start time and after calculate end time. 
+						and that logic should be in Aspect class
+						
+					--> AOP Concepts and Terminology
+					
+						10.2.1 Join point
+							--> Join point is any point in your program such as method execution, exception handling, 
+									field access etc. Spring supports only method execution join point.
+									
+						10.2.2 Advice
+							--> AOP have some of advices - Advice is a action taken by aspect at joinpoint.
+				
+								1. Before 
+									--> Run advice before the a method execution.
+								
+								2. After 
+									--> Run advice after the a method execution regardless of its outcome.
+									
+								3. After Returning
+									--> Run advice after the a method execution only if method completes successfully.
+									
+								4. After Throwing
+									--> Run advice after the a method execution only if method exits by throwing an exception.
+								
+								5. Around	
+									--> Run advice before and after the advised method is invoked.
+									
+						10.2.3 Pointcut
+							--> It is an expression language of AOP that matches join points.
+						
+						10.2.4 Target Object
+							--> It is the object i.e. being advised by one or more aspects. It is also known as proxied object in spring 
+								because Spring AOP is implemented using runtime proxies.
+								
+						10.2.5 Aspect
+							--> It is a class that contains advices, joinpoints etc.
+							
+						10.2.7 Interceptor
+							--> It is an aspect that contains only one advice.
+							
+						10.2.8 AOP Proxy
+							--> It is used to implement aspect contracts, created by AOP framework. 
+								It will be a JDK dynamic proxy or CGLIB proxy in spring framework.
+								
+						10.2.9 Weaving
+							--> It is the process of linking aspect with other application types or objects to create an advised object. 
+								Weaving can be done at compile time, load time or runtime. Spring AOP performs weaving at runtime.
+								
+						--> AOP implementations are provided by:
+							1. AspectJ
+							2. Spring AOP
+							3. JBoss AOP
+							
+							
+						Note : 
+							--> Expression does not check compile time.
+							--> if does'nt match signature it fails silently which is always written as string
+		
+		
+	
+		
+					
+			
